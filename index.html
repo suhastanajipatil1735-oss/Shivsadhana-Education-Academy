@@ -1,13 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shivsadhana Education Academy</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+
     <script>
       tailwind.config = {
         theme: {
@@ -30,28 +44,7 @@
         },
       }
     </script>
-    <style>
-      /* Smooth fade transitions */
-      .fade-enter {
-        opacity: 0;
-      }
-      .fade-enter-active {
-        opacity: 1;
-        transition: opacity 500ms ease-in;
-      }
-      .fade-exit {
-        opacity: 1;
-      }
-      .fade-exit-active {
-        opacity: 0;
-        transition: opacity 500ms ease-in;
-      }
-      
-      body {
-        background-color: #f3f4f6;
-      }
-    </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
@@ -63,7 +56,292 @@
 }
 </script>
 </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- SPLASH SCREEN -->
+    <section id="splash-screen" class="screen fixed inset-0 z-50 bg-gradient-to-br from-brand-900 to-brand-700 flex flex-col items-center justify-center text-white">
+        <div class="animate-bounce mb-8">
+            <i data-lucide="graduation-cap" class="w-24 h-24"></i>
+        </div>
+        <h1 class="text-3xl font-bold tracking-wider mb-2 text-center px-4 fade-in">
+            Shivsadhana Education Academy
+        </h1>
+        <p class="text-brand-200 text-sm tracking-widest uppercase fade-in">Empowering Future Leaders</p>
+        
+        <!-- Loading Animation -->
+        <div class="loader mt-8 fade-in"></div>
+    </section>
+
+    <!-- LOGIN SCREEN -->
+    <section id="login-screen" class="screen hidden min-h-screen flex items-center justify-center p-4 bg-gray-100">
+        <div class="bg-white w-full max-w-md p-8 rounded-xl shadow-lg">
+            <div class="flex justify-center mb-6">
+                <div class="bg-brand-100 p-4 rounded-full">
+                    <i data-lucide="users" class="w-8 h-8 text-brand-600"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Welcome Back</h2>
+            <p class="text-center text-gray-500 mb-8">Shivsadhana Education Academy</p>
+            
+            <form id="login-form">
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="password-input" placeholder="Enter Password" 
+                        class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none transition-all">
+                </div>
+                <div id="login-error" class="hidden bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-4 flex items-center gap-2">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    Incorrect password. Please try again.
+                </div>
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2 rounded-lg transition-colors shadow-md">
+                    Login to Dashboard
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- APP LAYOUT (Header + Main) -->
+    <div id="app-layout" class="hidden min-h-screen flex flex-col">
+        
+        <!-- Header -->
+        <header class="bg-brand-800 text-white shadow-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="navigateTo('dashboard')">
+                    <div class="bg-white/10 p-2 rounded-full">
+                        <i data-lucide="school" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <h1 class="text-lg font-bold tracking-wide hidden sm:block">Shivsadhana Academy</h1>
+                    <h1 class="text-lg font-bold tracking-wide sm:hidden">Shivsadhana</h1>
+                </div>
+                <button onclick="logout()" class="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center gap-2 text-sm">
+                    <span>Logout</span>
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-grow max-w-7xl mx-auto px-4 py-6 w-full pb-24 md:pb-6">
+            
+            <!-- DASHBOARD SCREEN -->
+            <section id="dashboard-screen" class="screen hidden space-y-6">
+                <!-- Stats Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-l-brand-500 flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Total Fees Collected</p>
+                            <h3 class="text-2xl font-bold text-gray-800 mt-1" id="stat-collected">₹0</h3>
+                        </div>
+                        <div class="p-2 bg-green-100 rounded-lg text-green-600">
+                            <i data-lucide="indian-rupee" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-l-blue-500 flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Total Students</p>
+                            <h3 class="text-2xl font-bold text-gray-800 mt-1" id="stat-students">0</h3>
+                        </div>
+                        <div class="p-2 bg-blue-100 rounded-lg text-blue-600">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-l-red-500 flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Total Due Amount</p>
+                            <h3 class="text-2xl font-bold text-gray-800 mt-1" id="stat-due">₹0</h3>
+                        </div>
+                        <div class="p-2 bg-red-100 rounded-lg text-red-600">
+                            <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="text-lg font-semibold mb-4">Students per Class</h3>
+                        <div class="relative h-64 w-full">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="text-lg font-semibold mb-4">Fees Collection vs Due</h3>
+                        <div class="relative h-64 w-full">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Action -->
+                <div class="md:hidden pt-2">
+                    <button onclick="navigateTo('add-student')" class="w-full bg-brand-600 text-white p-3 rounded-lg flex items-center justify-center gap-2 shadow-md">
+                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                        Add New Student
+                    </button>
+                </div>
+            </section>
+
+            <!-- ADD STUDENT SCREEN -->
+            <section id="add-student-screen" class="screen hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="flex items-center gap-4 mb-6">
+                        <button onclick="navigateTo('dashboard')" class="p-2 hover:bg-gray-200 rounded-full md:hidden">
+                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold" id="form-title">Add New Student</h2>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-xl shadow-sm">
+                        <form id="student-form">
+                            <input type="hidden" id="student-id">
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Student Name</label>
+                                <input type="text" id="name" required placeholder="e.g. Rahul Patil" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Class</label>
+                                <select id="classGrade" required class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                                    <option value="" disabled selected>Select Class</option>
+                                    <option value="5th">5th</option>
+                                    <option value="6th">6th</option>
+                                    <option value="7th">7th</option>
+                                    <option value="8th">8th</option>
+                                    <option value="9th">9th</option>
+                                    <option value="10th">10th</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Total Fees (₹)</label>
+                                    <input type="number" id="totalFees" required min="0" placeholder="0" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Fees Paid (₹)</label>
+                                    <input type="number" id="paidFees" required min="0" placeholder="0" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 p-4 rounded-lg mb-6 border border-gray-200">
+                                <p class="text-sm text-gray-500">Calculated Due Amount</p>
+                                <p class="text-xl font-bold text-green-600" id="calculated-due">₹0</p>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <button type="button" onclick="navigateTo('dashboard')" class="flex-1 bg-white border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50">Cancel</button>
+                                <button type="submit" class="flex-1 bg-brand-600 text-white py-2 rounded-lg hover:bg-brand-700 shadow-md">Save Student</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW ALL STUDENTS SCREEN -->
+            <section id="view-students-screen" class="screen hidden">
+                <div class="max-w-5xl mx-auto">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div class="flex items-center gap-4">
+                            <button onclick="navigateTo('dashboard')" class="p-2 hover:bg-gray-200 rounded-full md:hidden">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                            </button>
+                            <h2 class="text-2xl font-bold">All Students</h2>
+                        </div>
+                        <div class="relative w-full sm:w-64">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                            <input type="text" id="search-input" placeholder="Search by name..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div id="students-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Student Cards Injected Here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- FEES REMINDER SCREEN -->
+            <section id="fees-reminder-screen" class="screen hidden">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-4">
+                            <button onclick="navigateTo('dashboard')" class="p-2 hover:bg-gray-200 rounded-full md:hidden">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                            </button>
+                            <h2 class="text-2xl font-bold">Fees Reminders</h2>
+                        </div>
+                        <button onclick="sendWhatsApp()" id="whatsapp-btn" class="bg-brand-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-md hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            <span class="hidden sm:inline">Send WhatsApp Reminder</span>
+                            <span class="sm:hidden">WhatsApp</span>
+                        </button>
+                    </div>
+
+                    <div id="reminder-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Reminder Cards Injected Here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- REMOVE STUDENTS SCREEN -->
+            <section id="remove-students-screen" class="screen hidden">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex items-center gap-4 mb-6">
+                        <button onclick="navigateTo('dashboard')" class="p-2 hover:bg-gray-200 rounded-full md:hidden">
+                            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        </button>
+                        <h2 class="text-2xl font-bold text-red-700">Remove Students</h2>
+                    </div>
+
+                    <div class="bg-white p-6 mb-6 rounded-xl shadow-sm">
+                        <p class="text-sm text-gray-600 mb-4">Select a class to view and remove students. This action cannot be undone.</p>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Class</label>
+                        <select id="remove-class-filter" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                            <option value="" disabled selected>Select Class</option>
+                            <option value="5th">5th</option>
+                            <option value="6th">6th</option>
+                            <option value="7th">7th</option>
+                            <option value="8th">8th</option>
+                            <option value="9th">9th</option>
+                            <option value="10th">10th</option>
+                        </select>
+                    </div>
+
+                    <div id="remove-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Remove Cards Injected Here -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Bottom Navigation (Mobile) -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-40">
+            <div class="flex justify-around items-center h-16">
+                <button onclick="navigateTo('dashboard')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-500" data-target="dashboard">
+                    <i data-lucide="home" class="w-6 h-6"></i>
+                    <span class="text-[10px] font-medium">Home</span>
+                </button>
+                <button onclick="navigateTo('add-student')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-500" data-target="add-student">
+                    <i data-lucide="user-plus" class="w-6 h-6"></i>
+                    <span class="text-[10px] font-medium">Add</span>
+                </button>
+                <button onclick="navigateTo('view-students')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-500" data-target="view-students">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                    <span class="text-[10px] font-medium">View</span>
+                </button>
+                <button onclick="navigateTo('fees-reminder')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-500" data-target="fees-reminder">
+                    <i data-lucide="bell" class="w-6 h-6"></i>
+                    <span class="text-[10px] font-medium">Dues</span>
+                </button>
+                <button onclick="navigateTo('remove-students')" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 text-gray-500" data-target="remove-students">
+                    <i data-lucide="trash-2" class="w-6 h-6"></i>
+                    <span class="text-[10px] font-medium">Remove</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
 </html>
